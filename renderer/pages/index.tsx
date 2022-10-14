@@ -1,34 +1,43 @@
-import { useEffect } from 'react'
-import Link from 'next/link'
-import Layout from '../components/Layout'
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Layout from "../components/Layout";
+import sendAsync from "../services/test";
 
 const IndexPage = () => {
-  useEffect(() => {
-    const handleMessage = (_event, args) => alert(args)
+  const [message, setMessage] = useState("SELECT * FROM names");
+  const [response, setResponse] = useState();
 
-    // add a listener to 'message' channel
-    global.ipcRenderer.addListener('message', handleMessage)
-
-    return () => {
-      global.ipcRenderer.removeListener('message', handleMessage)
-    }
-  }, [])
-
-  const onSayHiClick = () => {
-    global.ipcRenderer.send('message', 'hi from next')
-  }
+  const send = (sql: string) => {
+    sendAsync(sql).then((result) => setResponse(result));
+  };
 
   return (
     <Layout title="Home | Next.js + TypeScript + Electron Example">
-      <h1>Hello Next.js 👋</h1>
-      <button onClick={onSayHiClick}>Say hi to electron</button>
+      <article>
+        <p>Send a query command to db</p>
+        <input
+          type="text"
+          value={message}
+          onChange={({ target: { value } }) => setMessage(value)}
+        />
+        <button type="button" onClick={() => send(message)}>
+          Send
+        </button>
+        <br />
+        <p>Main process responses:</p>
+        <br />
+        <pre>
+          {(response && JSON.stringify(response, null, 2)) ||
+            "No query results yet!"}
+        </pre>
+      </article>
       <p>
         <Link href="/about">
           <a>About</a>
         </Link>
       </p>
     </Layout>
-  )
-}
+  );
+};
 
-export default IndexPage
+export default IndexPage;

@@ -4,18 +4,24 @@
 //
 // import User from 'path/to/interfaces';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { IpcRenderer } from 'electron'
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
     interface Global {
-      ipcRenderer: IpcRenderer
+      ipcRenderer: {
+        sendMessage(channel: string, args: unknown[]): void;
+        on(
+          channel: string,
+          func: (...args: unknown[]) => void
+        ): (() => void) | undefined;
+        once(channel: string, func: (...args: unknown[]) => void): void;
+      };
     }
   }
 }
 
 export type User = {
-  id: number
-  name: string
-}
+  id: number;
+  name: string;
+};
